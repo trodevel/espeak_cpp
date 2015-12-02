@@ -1,0 +1,11 @@
+
+* required libraries
+
+3rd party:
+
+- libespeak-dev
+- libportaudio-dev
+
+own:
+
+-
