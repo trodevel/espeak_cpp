@@ -1,30 +1,32 @@
 #include <iostream>         // cout
+#include <map>              // std::map
 
 #include "espeak_cpp.h"     // ESpeakCpp
 
 int main()
 {
-    std::string lang;
-
-    std::cout << "enter language (en, de, ru): ";
-    std::getline( std::cin, lang );
-
-    std::string input;
-
-    std::cout << "enter text: ";
-    std::getline( std::cin, input );
+    std::map<std::string, std::string> texts =
+    {
+            { "en", "hello world" },
+            { "de", "hallo welt" },
+            { "ru", "привет мир" },
+    };
 
     espeak_cpp::ESpeakCpp g;
 
-    std::string filename( "text.mp3" );
+    std::string filename( "text.wav" );
     std::string error;
 
-    bool b = g.say( input, filename, lang, error );
+    for( auto & s : texts )
+    {
+        bool b = g.say( s.second, "test_" + s.first + ".wav", s.first, error );
 
-    if( b == false )
-        std::cout << "cannot download '" << filename << "', " << error << std::endl;
-    else
-        std::cout << "downloaded: OK '" << filename << "'" << std::endl;
+        if( b == false )
+            std::cout << "ERROR: failed to generate text for lang '" << s.first
+            << "', error " << error << std::endl;
+        else
+            std::cout << "OK: generated for '" << s.first << "'" << std::endl;
+    }
 
     return 0;
 }

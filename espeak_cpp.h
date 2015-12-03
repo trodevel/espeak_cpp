@@ -19,18 +19,25 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-// $Revision: 2882 $ $Date:: 2015-12-02 #$ $Author: serge $
+// $Revision: 2891 $ $Date:: 2015-12-03 #$ $Author: serge $
 
 #ifndef ESPEAK_CPP_ESPEAK_CPP_H
 #define ESPEAK_CPP_ESPEAK_CPP_H
 
 #include <string>
+#include <memory>       // std::unique_ptr
+
+namespace wave
+{
+class Wave;
+}
 
 namespace espeak_cpp
 {
 
 class ESpeakCpp
 {
+    friend class ESpeakSetter;
 public:
 
 public:
@@ -38,10 +45,16 @@ public:
 
     ~ESpeakCpp();
 
-    bool say( const std::string & text, const std::string & filename, const std::string & lang, std::string & error );
+    bool say( const std::string & text, const std::string & filename, const std::string & voice, std::string & error );
 
 private:
 
+    void set_sample_rate( int r );
+    void append_samples( const char* samples, int size );
+
+private:
+
+    std::unique_ptr<wave::Wave>     wav_;
 };
 
 } // namespace espeak_cpp

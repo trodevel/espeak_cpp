@@ -19,12 +19,17 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-// $Revision: 2882 $ $Date:: 2015-12-02 #$ $Author: serge $
+// $Revision: 2895 $ $Date:: 2015-12-03 #$ $Author: serge $
 
 
 #include "espeak_cpp.h"             // self
 
-using namespace espeak_cpp;
+#include <espeak/speak_lib.h>
+
+#include "../wave/wave.h"
+
+namespace espeak_cpp
+{
 
 ESpeakCpp::ESpeakCpp()
 {
@@ -34,8 +39,105 @@ ESpeakCpp::~ESpeakCpp()
 {
 }
 
-bool ESpeakCpp::say( const std::string & text, const std::string & filename, const std::string & lang, std::string & error )
+class ESpeakSetter
 {
-    return false;
+public:
+
+    static void set_sample_rate( ESpeakCpp * self, int rate )
+    {
+        self->set_sample_rate( rate );
+    }
+
+    static void append_samples( ESpeakCpp * self, const char* samples, int size )
+    {
+        self->append_samples( samples, size );
+    }
+};
+
+int espeak_callback( short *samples, int numsamples, espeak_EVENT *events )
+{
+    ESpeakCpp * self = nullptr;
+
+    int type;
+
+    if( samples == NULL )
+    {
+        return 0;
+    }
+
+    if( events )
+        self = static_cast<ESpeakCpp*>( events->user_data );
+
+    while( ( type = events->type ) != 0 )
+    {
+        if( events->type == espeakEVENT_SAMPLERATE )
+        {
+            ESpeakSetter::set_sample_rate( self, events->id.number );
+        }
+        events++;
+    }
+
+    if( numsamples > 0 )
+    {
+        ESpeakSetter::append_samples( self, (const char*)samples, numsamples * 2 );
+    }
+
+    return 0;
 }
 
+
+bool ESpeakCpp::say( const std::string & text, const std::string & filename, const std::string & voice, std::string & error )
+{
+    espeak_POSITION_TYPE position_type = POS_CHARACTER;
+    char *path = nullptr;
+    void *user_data = this;
+    unsigned int position = 0;
+    unsigned int end_position = 0;
+    unsigned int flags = espeakCHARS_AUTO;
+    unsigned int *unique_identifier = nullptr;
+    //int options = espeakINITIALIZE_PHONEME_EVENTS;
+    int options = 0;
+    int gap_between_words = 2;
+
+    espeak_AUDIO_OUTPUT output = AUDIO_OUTPUT_SYNCHRONOUS;
+    int sample_rate = espeak_Initialize( output, 0, path, options );
+
+    if( sample_rate == EE_INTERNAL_ERROR )
+    {
+        error = "espeak_Initialize failed";
+        return false;
+    }
+
+    espeak_SetParameter( espeakWORDGAP, gap_between_words, 0 );
+
+    espeak_SetSynthCallback( espeak_callback );
+
+    espeak_SetVoiceByName( voice.c_str() );
+
+    espeak_ERROR err2 = espeak_Synth( text.c_str(), text.size(), position,
+            position_type, end_position, flags, unique_identifier, user_data );
+
+    if( err2 != EE_OK )
+    {
+        error = "espeak_Synth failed";
+        return false;
+    }
+
+    espeak_Synchronize();
+
+    wav_->save( filename );
+
+    return true;
+}
+
+void ESpeakCpp::set_sample_rate( int r )
+{
+    wav_.reset( new wave::Wave( 1, r, 16 ) );
+}
+
+void ESpeakCpp::append_samples( const char* samples, int size )
+{
+    wav_->append_samples( samples, size );
+}
+
+}   // namespace

@@ -1,5 +1,5 @@
 # Makefile for libespeak_cpp
-# Copyright (C) 2014 Sergey Kolevatov
+# Copyright (C) 2015 Sergey Kolevatov
 
 ###################################################################
 
@@ -11,22 +11,7 @@ PROJECT := espeak_cpp
 
 ###################################################################
 
-BOOST_PATH := $(shell echo $$BOOST_PATH)
-
-ifeq (,$(BOOST_PATH))
-    $(error 'please define path to boost $$BOOST_PATH')
-endif
-
-###################################################################
-
-BOOST_INC=$(BOOST_PATH)
-BOOST_LIB_PATH=$(BOOST_PATH)/stage/lib
-
-BOOST_LIB_NAMES :=
-BOOST_LIBS = $(patsubst %,$(BOOST_LIB_PATH)/lib%.a,$(BOOST_LIB_NAMES))
-
-
-EXT_LIBS=-lcurl -lportaudio -lespeak $(BOOST_LIBS)
+EXT_LIBS=-lportaudio -lespeak
 
 ###################################################################
 
@@ -60,7 +45,7 @@ CC=gcc
 
 LDSHARED=gcc
 CPP=gcc -E
-INCL = -I$(BOOST_INC) -I.
+INCL = -I.
 
 
 STATICLIB=$(LIBNAME).a
@@ -82,7 +67,7 @@ EXE=
 SRCC = espeak_cpp.cpp
 OBJS = $(patsubst %.cpp,$(OBJDIR)/%.o,$(SRCC))
 
-LIB_NAMES = utils
+LIB_NAMES = wave
 LIBS = $(patsubst %,$(BINDIR)/lib%.a,$(LIB_NAMES))
 
 all: static
@@ -115,9 +100,9 @@ $(BINDIR)/lib%.a: %		# somehow this rule doesn't work
 	cd ../$<; make; cd $(project)
 	ln -sf ../$</$@ $(BINDIR)
 
-$(BINDIR)/libutils.a:
-	cd ../utils; make; cd $(project)
-	ln -sf ../../utils/$@ $(BINDIR)
+$(BINDIR)/libwave.a:
+	cd ../wave; make; cd $(project)
+	ln -sf ../../wave/$@ $(BINDIR)
 
 $(BINDIR):
 	@ mkdir -p $(OBJDIR)
