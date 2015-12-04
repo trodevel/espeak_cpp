@@ -7,14 +7,19 @@ int main()
 {
     std::map<std::string, std::string> texts =
     {
-            { "en", "hello world" },
-            { "de", "hallo welt" },
-            { "ru", "привет мир" },
+            { "en",     "hello world" },
+            { "mb-en1", "hello world" },
+            { "mb-us1", "hello world" },
+            { "de",     "hallo welt" },
+            { "mb-de4", "hallo welt" },
+            { "mb-de5", "hallo welt" },
+            { "mb-de6", "hallo welt" },
+            { "mb-de7", "hallo welt" },
+            { "ru",     "привет мир" },
     };
 
     espeak_cpp::ESpeakCpp g;
 
-    std::string filename( "text.wav" );
     std::string error;
 
     for( auto & s : texts )

@@ -19,7 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-// $Revision: 2891 $ $Date:: 2015-12-03 #$ $Author: serge $
+// $Revision: 2896 $ $Date:: 2015-12-04 #$ $Author: serge $
 
 #ifndef ESPEAK_CPP_ESPEAK_CPP_H
 #define ESPEAK_CPP_ESPEAK_CPP_H
@@ -53,6 +53,8 @@ private:
     void append_samples( const char* samples, int size );
 
 private:
+
+    bool                            is_inited_;
 
     std::unique_ptr<wave::Wave>     wav_;
 };

@@ -19,7 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-// $Revision: 2895 $ $Date:: 2015-12-03 #$ $Author: serge $
+// $Revision: 2896 $ $Date:: 2015-12-04 #$ $Author: serge $
 
 
 #include "espeak_cpp.h"             // self
@@ -31,12 +31,29 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 namespace espeak_cpp
 {
 
-ESpeakCpp::ESpeakCpp()
+ESpeakCpp::ESpeakCpp():
+        is_inited_( false )
 {
+    char *path = nullptr;
+    //int options = espeakINITIALIZE_PHONEME_EVENTS;
+    int options = 0;
+
+    espeak_AUDIO_OUTPUT output = AUDIO_OUTPUT_SYNCHRONOUS;
+    int sample_rate = espeak_Initialize( output, 0, path, options );
+
+    if( sample_rate != EE_INTERNAL_ERROR )
+    {
+        is_inited_ = true;
+    }
 }
 
 ESpeakCpp::~ESpeakCpp()
 {
+    if( is_inited_ )
+    {
+        is_inited_  = false;
+        espeak_Terminate();
+    }
 }
 
 class ESpeakSetter
@@ -89,20 +106,15 @@ int espeak_callback( short *samples, int numsamples, espeak_EVENT *events )
 bool ESpeakCpp::say( const std::string & text, const std::string & filename, const std::string & voice, std::string & error )
 {
     espeak_POSITION_TYPE position_type = POS_CHARACTER;
-    char *path = nullptr;
     void *user_data = this;
     unsigned int position = 0;
     unsigned int end_position = 0;
     unsigned int flags = espeakCHARS_AUTO;
     unsigned int *unique_identifier = nullptr;
-    //int options = espeakINITIALIZE_PHONEME_EVENTS;
-    int options = 0;
+
     int gap_between_words = 2;
 
-    espeak_AUDIO_OUTPUT output = AUDIO_OUTPUT_SYNCHRONOUS;
-    int sample_rate = espeak_Initialize( output, 0, path, options );
-
-    if( sample_rate == EE_INTERNAL_ERROR )
+    if( is_inited_ == false )
     {
         error = "espeak_Initialize failed";
         return false;
