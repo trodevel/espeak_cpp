@@ -19,7 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-// $Revision: 2899 $ $Date:: 2015-12-05 #$ $Author: serge $
+// $Revision: 2930 $ $Date:: 2015-12-07 #$ $Author: serge $
 
 #ifndef ESPEAK_CPP_ESPEAK_CPP_H
 #define ESPEAK_CPP_ESPEAK_CPP_H
@@ -48,6 +48,7 @@ public:
     bool say( const std::string & text, const std::string & filename, const std::string & voice, std::string & error );
 
     void set_gap_between_words( int n );
+    void set_word_rate( int n );
 
 private:
 
@@ -58,6 +59,7 @@ private:
 
     bool                            is_inited_;
     int                             gap_between_words_;
+    int                             word_rate_;
 
     std::unique_ptr<wave::Wave>     wav_;
 };

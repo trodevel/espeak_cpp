@@ -19,7 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-// $Revision: 2899 $ $Date:: 2015-12-05 #$ $Author: serge $
+// $Revision: 2930 $ $Date:: 2015-12-07 #$ $Author: serge $
 
 
 #include "espeak_cpp.h"             // self
@@ -33,7 +33,8 @@ namespace espeak_cpp
 
 ESpeakCpp::ESpeakCpp():
         is_inited_( false ),
-        gap_between_words_( 2 )
+        gap_between_words_( 2 ),
+        word_rate_( 130 )
 {
     char *path = nullptr;
     //int options = espeakINITIALIZE_PHONEME_EVENTS;
@@ -120,6 +121,7 @@ bool ESpeakCpp::say( const std::string & text, const std::string & filename, con
     }
 
     espeak_SetParameter( espeakWORDGAP, gap_between_words_, 0 );
+    espeak_SetParameter( espeakRATE,    word_rate_, 0 );
 
     espeak_SetSynthCallback( espeak_callback );
 
@@ -147,6 +149,10 @@ void ESpeakCpp::set_gap_between_words( int n )
     gap_between_words_  = n;
 }
 
+void ESpeakCpp::set_word_rate( int n )
+{
+    word_rate_  = n;
+}
 
 void ESpeakCpp::set_sample_rate( int r )
 {
