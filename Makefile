@@ -94,7 +94,7 @@ $(TARGET): $(BINDIR) $(BINDIR)/$(TARGET)
 	@echo "$@ uptodate - ${MODE}"
 
 $(BINDIR)/$(TARGET): $(LIBS) $(OBJDIR)/$(TARGET).o $(OBJS) $(BINDIR)/$(STATICLIB)
-	$(CC) $(CFLAGS) -o $@ $(OBJDIR)/$(TARGET).o $(BINDIR)/$(LIBNAME).a $(LIBS) $(EXT_LIBS) $(LFLAGS_TEST)
+	$(CC) $(CFLAGS) -o $@ $(OBJDIR)/$(TARGET).o $(BINDIR)/$(LIBNAME).a $(EXT_LIBS) $(LFLAGS_TEST) $(LIBS)
 
 $(BINDIR)/lib%.a: %		# somehow this rule doesn't work
 	cd ../$<; make; cd $(project)
